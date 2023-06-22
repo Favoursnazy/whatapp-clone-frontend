@@ -1,5 +1,21 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+//Pages
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+
 function App() {
-  return <h1 className="text-3xl font-bold underline">Hello world!</h1>;
+  return (
+    <div className="dark">
+      <Router>
+        <Routes>
+          <Route exact path="/" element={<Home />} />
+          <Route exact path="/login" element={<Login />} />
+          <Route exact path="/register" element={<Register />} />
+        </Routes>
+      </Router>
+    </div>
+  );
 }
 
 export default App;
