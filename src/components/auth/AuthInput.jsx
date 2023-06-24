@@ -1,10 +1,10 @@
 import React from "react";
 
-const AuthInput = ({ name, type, placeholder, register, error }) => {
+const AuthInput = ({ name, type, placeholder, labelName, register, error }) => {
   return (
     <div className="mt-8 content-center dark:text-dark_text_1 space-y-1">
       <label htmlFor={name} className="text-sm font-bold tracking-wide">
-        {placeholder}
+        {labelName}
       </label>
       <input
         type={type}

@@ -13,7 +13,7 @@ const persistConfig = {
   key: "user",
   storage,
   whitelist: ["user"],
-  transform: [savedUserOnlyFilter],
+  transforms: [savedUserOnlyFilter],
 };
 
 const rootReducer = combineReducers({
@@ -24,11 +24,11 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
   reducer: persistedReducer,
-  devTools: true,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
     }),
+  devTools: true,
 });
 
 export const persistor = persistStore(store);
