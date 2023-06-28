@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FilterIcon, ReturnIcon, SearchIcon } from "../../../svg";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -7,6 +7,8 @@ const SEARCH_ENDPOINT = `${import.meta.env.VITE_API_ENDPOINT}`;
 const Search = ({ searchLength, setSearchResults }) => {
   const [show, setShow] = useState(false);
   const { user } = useSelector((state) => state.user);
+  const inputRef = useRef();
+
   const handleSearch = async (e) => {
     if (e.target.value && e.key === "Enter") {
       try {
@@ -26,6 +28,12 @@ const Search = ({ searchLength, setSearchResults }) => {
       setSearchResults([]);
     }
   };
+
+  const handleCloseAll = () => {
+    setSearchResults([]);
+    inputRef.current.value = "";
+  };
+
   return (
     <div className="h-[49px] py1.5">
       {/* container */}
@@ -34,7 +42,10 @@ const Search = ({ searchLength, setSearchResults }) => {
         <div className="flex items-center gap-x-2">
           <div className="w-full flex dark:bg-dark_bg_2 rounded-lg pl-2">
             {show || searchLength > 0 ? (
-              <span className="w-8 flex items-center justify-center rotateAnimation">
+              <span
+                onClick={handleCloseAll}
+                className="w-8 flex items-center justify-center rotateAnimation cursor-pointer"
+              >
                 <ReturnIcon className="dark:fill-green_1 w-5" />
               </span>
             ) : (
@@ -49,6 +60,7 @@ const Search = ({ searchLength, setSearchResults }) => {
               onFocus={() => setShow(true)}
               onBlur={() => searchLength === 0 && setShow(false)}
               onKeyDown={(e) => handleSearch(e)}
+              ref={inputRef}
             />
           </div>
           <button className="btn">

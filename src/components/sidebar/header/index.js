@@ -1,3 +1,3 @@
 import SideBarHeader from "./SideBarHeader";
-
-export { SideBarHeader };
+import Menu from "./Menu";
+export { SideBarHeader, Menu };

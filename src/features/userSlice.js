@@ -28,6 +28,7 @@ export const registerUser = createAsyncThunk(
     }
   }
 );
+
 export const loginUser = createAsyncThunk(
   "auth/login",
   async (values, { rejectWithValue }) => {
@@ -47,16 +48,16 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
-      (state.status = ""),
-        (state.error = ""),
-        (state.user = {
-          id: "",
-          name: "",
-          email: "",
-          picture: "",
-          status: "",
-          token: "",
-        });
+      (state.user = {
+        id: "",
+        name: "",
+        email: "",
+        picture: "",
+        status: "",
+        token: "",
+      }),
+        (state.status = ""),
+        (state.error = "");
     },
     changeStatus: (state, action) => {
       state.status = action.payload;

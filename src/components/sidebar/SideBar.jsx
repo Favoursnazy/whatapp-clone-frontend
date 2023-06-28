@@ -7,7 +7,7 @@ import { Conversations } from "./conversations";
 const SideBar = () => {
   const [searchResults, setSearchResults] = useState([]);
   return (
-    <div className="w-[30%] h-full select-none">
+    <div className="w-[40%] h-full select-none">
       {/* Sidebar Header */}
       <SideBarHeader />
       {/* Notifiactions */}
@@ -21,7 +21,10 @@ const SideBar = () => {
       {searchResults.length > 0 ? (
         <>
           {/* Serch Results */}
-          <SearchResults searchResults={searchResults} />
+          <SearchResults
+            searchResults={searchResults}
+            setSearchResults={setSearchResults}
+          />
         </>
       ) : (
         <>
