@@ -4,10 +4,10 @@ import { Notifications } from "./notification";
 import { Search, SearchResults } from "./search";
 import { Conversations } from "./conversations";
 
-const SideBar = () => {
+const SideBar = ({ onlineUsers, typing }) => {
   const [searchResults, setSearchResults] = useState([]);
   return (
-    <div className="w-[40%] h-full select-none">
+    <div className="flex0030 m-w-[30%] h-full select-none">
       {/* Sidebar Header */}
       <SideBarHeader />
       {/* Notifiactions */}
@@ -29,7 +29,7 @@ const SideBar = () => {
       ) : (
         <>
           {/* Converstions */}
-          <Conversations />
+          <Conversations onlineUsers={onlineUsers} typing={typing} />
         </>
       )}
     </div>

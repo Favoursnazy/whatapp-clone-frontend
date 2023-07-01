@@ -4,10 +4,11 @@ import { ChatMesages } from "./messages";
 import { useDispatch, useSelector } from "react-redux";
 import { getConversationMessages } from "../../features/chatSlice";
 import { ChatActions } from "./actions";
+import { checkOnlineStatus, getConversationId } from "../../utils/chat";
 
-const ChatContainer = () => {
+const ChatContainer = ({ onlineUsers, typing }) => {
   const dispatch = useDispatch();
-  const { activeConversation, messages } = useSelector((state) => state.chat);
+  const { activeConversation } = useSelector((state) => state.chat);
   const { user } = useSelector((state) => state.user);
   const { token } = user;
   const values = {
@@ -24,9 +25,15 @@ const ChatContainer = () => {
       {/* Container */}
       <div>
         {/* Chat Header */}
-        <ChatHeader />
+        <ChatHeader
+          online={checkOnlineStatus(
+            onlineUsers,
+            user,
+            activeConversation.users
+          )}
+        />
         {/* Chat Messages */}
-        <ChatMesages />
+        <ChatMesages typing={typing} />
         {/* Chat Actions */}
         <ChatActions />
       </div>

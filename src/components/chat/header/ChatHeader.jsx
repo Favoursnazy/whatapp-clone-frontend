@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { getChatUsername, getUserProfilePicture } from "../../../utils/chat";
 import { DotsIcon, SearchLargeIcon } from "../../../svg";
 
-const ChatHeader = () => {
+const ChatHeader = ({ online }) => {
   const { activeConversation } = useSelector((state) => state.chat);
   const { user } = useSelector((state) => state.user);
   const picture = getUserProfilePicture(user, activeConversation.users);
@@ -26,7 +26,9 @@ const ChatHeader = () => {
           {/* Conversation name and online status */}
           <div className="flex flex-col">
             <h1 className="dark:text-white text-md font-bold ">{name}</h1>
-            <span className="text-xs dark:text-dark_svg_2">Online</span>
+            <span className="text-xs dark:text-dark_svg_2">
+              {online ? "Online" : "Offline"}
+            </span>
           </div>
         </div>
         {/* right */}

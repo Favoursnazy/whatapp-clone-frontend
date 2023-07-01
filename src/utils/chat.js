@@ -9,3 +9,9 @@ export const getUserProfilePicture = (user, users) => {
 export const getChatUsername = (user, users) => {
   return users[0]._id === user.id ? users[1].name : users[0].name;
 };
+
+export const checkOnlineStatus = (onlineUsers, user, users) => {
+  let convoId = getConversationId(user, users);
+  let check = onlineUsers.find((u) => u.userId === convoId);
+  return check ? true : false;
+};

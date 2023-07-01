@@ -11,7 +11,12 @@ html {
 
 @layer components {
   .container {
-    @apply w-[1700px] h-full;
+    width: calc(100% - 38px);
+    max-width: 1600px;
+  }
+
+  .flex0030 {
+    flex: 0 0 30%;
   }
 
   .btn {
@@ -46,6 +51,9 @@ html {
     height: calc(100vh - 120px);
     overflow-y: auto;
     overflow-x: hidden;
+  }
+  .online {
+    border: 2px solid #00a884;
   }
 }
 
