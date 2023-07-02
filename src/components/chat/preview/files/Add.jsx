@@ -1,15 +1,13 @@
-import React from "react";
-import { DocumentIcon } from "../../../../../svg";
 import { useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { addFiles } from "../../../../../features/chatSlice";
-import { getFileType } from "../../../../../utils/file";
+import { CloseIcon } from "../../../../svg";
+import { useDispatch } from "react-redux";
+import { addFiles } from "../../../../features/chatSlice";
+import { getFileType } from "../../../../utils/file";
 
-const DocumentAttachments = () => {
-  const inputRef = useRef();
+const Add = ({ setActiveIndex }) => {
+  const inputRef = useRef(null);
   const dispatch = useDispatch();
-  const { files } = useSelector((state) => state.chat);
-  const documentHandler = (e) => {
+  const filesHandler = (e) => {
     let files = Array.from(e.target.files);
     files.forEach((file) => {
       if (
@@ -27,7 +25,14 @@ const DocumentAttachments = () => {
         file.type !== "application/vnd.rar" &&
         file.type !== "application/x-zip-compressed" &&
         file.type !== "audio/mpeg" &&
-        file.type !== "audio/wav"
+        file.type !== "audio/wav" &&
+        file.type !== "image/png" &&
+        file.type !== "image/jpeg" &&
+        file.type !== "image/webp" &&
+        file.type !== "image/gif" &&
+        file.type !== "video/mp4" &&
+        file.type !== "video/mpeg" &&
+        file.type !== "video/webm"
       ) {
         // files = files.filter((item) => item.name !== file.name);
         // return;
@@ -42,6 +47,8 @@ const DocumentAttachments = () => {
           dispatch(
             addFiles({
               file: file,
+              imgData:
+                getFileType(file.type) === "IMAGE" ? e.target.result : "",
               type: getFileType(file.type),
             })
           );
@@ -50,24 +57,25 @@ const DocumentAttachments = () => {
     });
   };
   return (
-    <li>
-      <button
-        type="button"
-        className="bg-[#5F66CD] rounded-full"
+    <>
+      <div
         onClick={() => inputRef.current.click()}
+        className="w-14 mt-2 h-14 border dark:border-white rounded-md flex items-center justify-center cursor-pointer"
       >
-        <DocumentIcon />
-      </button>
+        <span className="rotate-45">
+          <CloseIcon className="dark:fill-dark_svg_1" />
+        </span>
+      </div>
       <input
         type="file"
-        hidden
         multiple
+        hidden
         ref={inputRef}
-        accept="application/*, text/plain"
-        onChange={documentHandler}
+        accept="application/*,text/plain,image/png,image/jpeg,image/gif,image/webp,video/mp4,video/mpeg,video/webm"
+        onChange={filesHandler}
       />
-    </li>
+    </>
   );
 };
 
-export default DocumentAttachments;
+export default Add;

@@ -24,6 +24,7 @@ export default {
         green_1: "#00a884",
         green_2: "#008069",
         green_3: "#005C4B",
+        green_4: "#023020",
       },
     },
   },

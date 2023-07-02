@@ -5,17 +5,23 @@ export const getFileType = (memType) => {
     case "application/pdf":
       return "PDF";
     case "application/msword":
-    case "appilication/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
       return "DOCX";
     case "application/vnd.ms-powerpoint":
-    case "appilication/vnd.openxmlformats-officedocument.presentationml.presentation":
+    case "application/powerpoint":
+    case "application/mspowerpoint":
+    case "application/x-mspowerpoint":
+    case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
       return "PPTX";
     case "application/vnd.ms-excel":
-    case "appilication/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+    case "application/x-msexcel":
+    case "application/x-excel":
+    case "application/excel":
+    case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
       return "XLSX";
     case "application/vnd.rar":
       return "RAR";
-    case "application/zip":
+    case "application/x-zip-compressed":
       return "ZIP";
     case "audion/mpeg":
     case "audio/wav":
