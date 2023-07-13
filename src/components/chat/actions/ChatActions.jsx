@@ -7,10 +7,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { sendMessageToUser } from "../../../features/chatSlice";
 import { ClipLoader } from "react-spinners";
 import SocketContext from "../../../context/SocketContext";
+import { FaMicrophone } from "react-icons/fa";
+import VoiceRecord from "./attachments/menu/VoiceRecord";
 
 const ChatActions = ({ socket }) => {
   const [showPicker, setShowPicker] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
+  const [showAudioRecorder, setShowAudioRecorder] = useState(false);
   const [loading, setLoading] = useState(false);
   const txtRef = useRef();
   const [message, setMessage] = useState("");
@@ -37,35 +40,49 @@ const ChatActions = ({ socket }) => {
       onSubmit={(e) => sendMessageHandler(e)}
       className="dark:bg-dark_bg_2 h-[60px] w-full flex items-center absolute bottom-0 py-2 px-4 select-none"
     >
-      {/* Container */}
-      <div className="w-full flex items-center gap-x-2">
-        {/* Emojis and attachment */}
-        <ul className="flex gap-x-2">
-          <EmojiPickerApp
-            txtRef={txtRef}
-            message={message}
-            setMessage={setMessage}
-            showPicker={showPicker}
-            setShowPicker={setShowPicker}
-            setShowAttachments={setShowAttachments}
-          />
-          <Attachments
-            showAttachments={showAttachments}
-            setShowAttachments={setShowAttachments}
-            setShowPicker={setShowPicker}
-          />
-        </ul>
-        {/* Input */}
-        <Inputs message={message} setMessage={setMessage} txtRef={txtRef} />
-        {/* Send Button */}
-        <button type="submit" className="btn">
-          {status === "loading" && loading ? (
-            <ClipLoader color="#E9EDEF" size={25} />
+      {!showAudioRecorder ? (
+        <div className="w-full flex items-center gap-x-2">
+          {/* Emojis and attachment */}
+          <ul className="flex gap-x-2">
+            <EmojiPickerApp
+              txtRef={txtRef}
+              message={message}
+              setMessage={setMessage}
+              showPicker={showPicker}
+              setShowPicker={setShowPicker}
+              setShowAttachments={setShowAttachments}
+            />
+            <Attachments
+              showAttachments={showAttachments}
+              setShowAttachments={setShowAttachments}
+              setShowPicker={setShowPicker}
+            />
+          </ul>
+          {/* Input */}
+          <Inputs message={message} setMessage={setMessage} txtRef={txtRef} />
+          {/* Send Button */}
+          {message.length > 0 ? (
+            <button type="submit" className="btn">
+              {status === loading && loading ? (
+                <ClipLoader color="#E9EDEF" size={25} />
+              ) : (
+                <SendIcon className="dark:fill-dark_svg_1" />
+              )}
+            </button>
           ) : (
-            <SendIcon className="dark:fill-dark_svg_1" />
+            <button className="btn" type="button">
+              <FaMicrophone
+                color="#E9EDEF"
+                size={25}
+                onClick={() => setShowAudioRecorder((prev) => !prev)}
+              />
+            </button>
           )}
-        </button>
-      </div>
+        </div>
+      ) : (
+        <VoiceRecord setShowAudioRecorder={setShowAudioRecorder} />
+      )}
+      {/* Container */}
     </form>
   );
 };

@@ -40,6 +40,7 @@ const PhotoAttachment = () => {
       }
     });
   };
+
   return (
     <li>
       <button

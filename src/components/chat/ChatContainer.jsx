@@ -7,7 +7,7 @@ import { ChatActions } from "./actions";
 import { checkOnlineStatus, getConversationId } from "../../utils/chat";
 import FilesPreview from "./preview/files/FilesPreview";
 
-const ChatContainer = ({ onlineUsers, typing }) => {
+const ChatContainer = ({ onlineUsers, typing, callUser, audioCall }) => {
   const dispatch = useDispatch();
   const { activeConversation, files } = useSelector((state) => state.chat);
   const { user } = useSelector((state) => state.user);
@@ -27,11 +27,13 @@ const ChatContainer = ({ onlineUsers, typing }) => {
       <div>
         {/* Chat Header */}
         <ChatHeader
-          online={checkOnlineStatus(
-            onlineUsers,
-            user,
-            activeConversation.users
-          )}
+          online={
+            activeConversation.isGroup
+              ? false
+              : checkOnlineStatus(onlineUsers, user, activeConversation.users)
+          }
+          callUser={callUser}
+          audioCall={audioCall}
         />
         {files.length > 0 ? (
           <FilesPreview />

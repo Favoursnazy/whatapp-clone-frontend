@@ -25,6 +25,8 @@ export default {
         green_2: "#008069",
         green_3: "#005C4B",
         green_4: "#023020",
+        search_input_container_background: "#111b21",
+        bubble_meta: "hsla(0,0%,100%,0.6)",
       },
     },
   },

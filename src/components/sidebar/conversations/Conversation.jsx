@@ -8,6 +8,8 @@ import {
 } from "../../../utils/chat";
 import { createConversation } from "../../../features/chatSlice";
 import SocketContext from "../../../context/SocketContext";
+import { capitalize } from "../../../utils/string";
+import { lastestMessageConversation } from "../../../utils/conversation";
 
 const Conversation = ({ convo, socket, online, typing }) => {
   const { user } = useSelector((state) => state.user);
@@ -16,14 +18,19 @@ const Conversation = ({ convo, socket, online, typing }) => {
   const dispatch = useDispatch();
   const values = {
     reciever_id: getConversationId(user, convo.users),
+    isGroup: convo.isGroup ? convo._id : false,
     token,
   };
   const openConversation = async () => {
     const newConvo = await dispatch(createConversation(values));
-    socket.emit("join_conversation", newConvo.payload._id);
+    socket.emit("join_conversation", newConvo?.payload?._id);
   };
-  const picture = getUserProfilePicture(user, convo.users);
-  const name = getChatUsername(user, convo.users);
+  const picture = convo.isGroup
+    ? convo.picture
+    : getUserProfilePicture(user, convo.users);
+  const name = convo.isGroup
+    ? convo.name
+    : capitalize(getChatUsername(user, convo.users));
   return (
     <li
       onClick={() => openConversation()}
@@ -59,10 +66,8 @@ const Conversation = ({ convo, socket, online, typing }) => {
                 {typing === convo._id ? (
                   <p className="text-green_1">{`${name} is Typing`}</p>
                 ) : (
-                  <p>
-                    {convo?.latestMessage?.message.length > 35
-                      ? `${convo?.latestMessage?.message.substring(0, 35)}...`
-                      : convo?.latestMessage?.message}
+                  <p className="truncate">
+                    {lastestMessageConversation(convo?.latestMessage)}
                   </p>
                 )}
               </div>

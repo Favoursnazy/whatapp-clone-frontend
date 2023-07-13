@@ -1,8 +1,10 @@
-import { MdDownloading } from "react-icons/md";
+import { BsArrowDownCircle } from "react-icons/bs";
 
-const OtherFiles = ({ file, type }) => {
+const OtherFiles = ({ file, type, me }) => {
   return (
-    <div className="bg-green_4 p-2 rounded-lg">
+    <div
+      className={`${me ? "bg-green_4" : "dark:bg-dark_bg_1"} p-2 rounded-lg`}
+    >
       {/* container */}
       <div className="flex justify-between gap-x-8">
         {/* file infos */}
@@ -23,7 +25,7 @@ const OtherFiles = ({ file, type }) => {
         </div>
         {/* Download button */}
         <a href={file.secure_url} target="_blank" download>
-          <MdDownloading size={30} />
+          <BsArrowDownCircle size={30} />
         </a>
       </div>
     </div>

@@ -25,7 +25,7 @@ const Menu = () => {
       </li>
       <DocumentAttachments />
       <li>
-        <button type="button" className=" bg-[#D3396D] rounded-full">
+        <button type="button" className="bg-[#D3396D] rounded-full">
           <CameraIcon />
         </button>
       </li>
