@@ -23,6 +23,7 @@ const LoginForm = () => {
   const onSubmit = async (data) => {
     let res = await dispatch(loginUser({ ...data }));
     if (res.payload?.user) navigate("/");
+    await localStorage.setItem("token", res.payload?.user.token);
   };
 
   return (

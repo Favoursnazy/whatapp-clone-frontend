@@ -1,9 +1,10 @@
 import moment from "moment";
+import MessageStatus from "../../sidebar/MessageStatus";
 
 const Message = ({ message, me }) => {
   return (
     <div
-      className={`w-full flex mt-2 space-x-3 max-w-xs ${
+      className={`w-full flex mt-2 space-x-3 lg:max-w-xl md:max-w-lg sm:max-sm ${
         me ? "ml-auto justify-end" : ""
       } `}
     >
@@ -20,18 +21,19 @@ const Message = ({ message, me }) => {
           </div>
         )}
         <div
-          className={`relative h-full dark:text-dark_text_1 p-2 rounded-lg ${
+          className={`relative h-full  dark:text-dark_text_1 p-2 rounded-lg ${
             me ? "bg-green_3" : "dark:bg-dark_bg_2"
           }`}
         >
           {/* Message */}
-          <p className="float-left h-full text-sm pb-4 pr-8">
-            {message.message}
-          </p>
+          <p className="h-full text-base pb-3 pr-10">{message.message}</p>
           {/* Message Date */}
-          <span className="absolute right-1.5 bottom-1.5 text-xs text-dark_text_5 leading-none">
-            {moment(message.createdAt).format("HH:mm")}
-          </span>
+          <div className="flex items-center justify-center gap-1 absolute right-1.5 bottom-1.5">
+            <span className="text-xs text-dark_text_5 leading-none">
+              {moment(message.createdAt).format("LT")}
+            </span>
+            {me && <MessageStatus messageStatus={message?.status} />}
+          </div>
         </div>
       </div>
     </div>

@@ -6,31 +6,52 @@ import {
   getConversationId,
   getUserProfilePicture,
 } from "../../../utils/chat";
-import { createConversation } from "../../../features/chatSlice";
-import SocketContext from "../../../context/SocketContext";
+import {
+  clearUnreadMessages,
+  createConversation,
+} from "../../../features/chatSlice";
 import { capitalize } from "../../../utils/string";
 import { lastestMessageConversation } from "../../../utils/conversation";
+import MessageStatus from "../MessageStatus";
 
-const Conversation = ({ convo, socket, online, typing }) => {
+const Conversation = ({ convo, online, typing, setToggleMobile }) => {
   const { user } = useSelector((state) => state.user);
   const { activeConversation } = useSelector((state) => state.chat);
+  const { socket } = useSelector((state) => state.socket);
   const { token } = user;
   const dispatch = useDispatch();
+
+  // Values to sent to backend to create a new message
   const values = {
-    reciever_id: getConversationId(user, convo.users),
+    reciever_id: convo.isGroup ? "group" : getConversationId(user, convo.users),
     isGroup: convo.isGroup ? convo._id : false,
+    convo_id: convo._id ? convo._id : false,
+    unreadMessages: convo.unreadMessages,
     token,
   };
+
+  //Opening a new conversation between users
   const openConversation = async () => {
     const newConvo = await dispatch(createConversation(values));
     socket.emit("join_conversation", newConvo?.payload?._id);
+    if (convo?.unreadMessages && convo?.unreadMessages > 0) {
+      dispatch(clearUnreadMessages(convo?._id));
+      socket.emit("updateRead", newConvo.payload);
+    }
+    sessionStorage.setItem("activeConvo", newConvo.payload._id);
+    setToggleMobile(true);
   };
+
+  // Getting a user profile picture
   const picture = convo.isGroup
     ? convo.picture
     : getUserProfilePicture(user, convo.users);
+
+  // Getting the cuurent unique name
   const name = convo.isGroup
     ? convo.name
     : capitalize(getChatUsername(user, convo.users));
+
   return (
     <li
       onClick={() => openConversation()}
@@ -63,24 +84,43 @@ const Conversation = ({ convo, socket, online, typing }) => {
             {/* Conversation message */}
             <div className="flex items-center gap-x-1 dark:text-dark_text_2">
               <div className="flex-1 items-center gap-x-1 dark:text-dark_text_2">
-                {typing === convo._id ? (
-                  <p className="text-green_1">{`${name} is Typing`}</p>
-                ) : (
-                  <p className="truncate">
-                    {lastestMessageConversation(convo?.latestMessage)}
-                  </p>
-                )}
+                <div className="flex flex-row items-center gap-1">
+                  {convo?.latestMessage?.sender?._id === user.id &&
+                    convo?.latestMessage?.status && (
+                      <MessageStatus
+                        messageStatus={convo?.latestMessage?.status}
+                      />
+                    )}
+                  {typing === convo._id ? (
+                    <p className="text-green_1 whitespace-nowrap">{`${name} is Typing`}</p>
+                  ) : (
+                    <p className="truncate whitespace-nowrap">
+                      {lastestMessageConversation(convo?.latestMessage)}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
         {/* Right */}
         <div className="flex flex-col gap-y-4 items-end text-xs">
-          <span className="dark:text-dark_text_2">
+          <span
+            className={`${
+              convo.unreadMessages <= 0
+                ? "dark:text-dark_text_2"
+                : "text-[#00a884]"
+            }`}
+          >
             {convo.latestMessage?.createdAt
               ? dateHandler(convo.latestMessage?.createdAt)
               : ""}
           </span>
+          {convo.unreadMessages > 0 && (
+            <span className="bg-[#00a884] rounded-full text-sm px-[5px] flex items-center text-black">
+              {convo.unreadMessages}
+            </span>
+          )}
         </div>
       </div>
       {/* Border*/}
@@ -89,10 +129,4 @@ const Conversation = ({ convo, socket, online, typing }) => {
   );
 };
 
-const ConversationWithContext = (props) => (
-  <SocketContext.Consumer>
-    {(socket) => <Conversation {...props} socket={socket} />}
-  </SocketContext.Consumer>
-);
-
-export default ConversationWithContext;
+export default Conversation;

@@ -2,7 +2,7 @@ export default function Logo() {
   return (
     <svg
       viewBox="0 0 303 172"
-      width={360}
+      width={320}
       preserveAspectRatio="xMidYMid meet"
       fill="none"
     >

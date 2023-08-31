@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-const AUTH_ENDPOINT = `${import.meta.env.VITE_API_ENDPOINT}/auth`;
+import { AUTH_END_POINT } from "../utils/constants";
+import Axios from "../api/Axios";
 
 const initialState = {
   user: {
@@ -19,7 +20,7 @@ export const registerUser = createAsyncThunk(
   "auth/regsiter",
   async (values, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post(`${AUTH_ENDPOINT}/register`, {
+      const { data } = await Axios.post(`${AUTH_END_POINT}/register`, {
         ...values,
       });
       return data;
@@ -33,7 +34,7 @@ export const loginUser = createAsyncThunk(
   "auth/login",
   async (values, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post(`${AUTH_ENDPOINT}/login`, {
+      const { data } = await Axios.post(`${AUTH_END_POINT}/login`, {
         ...values,
       });
       return data;
@@ -61,6 +62,11 @@ export const userSlice = createSlice({
     },
     changeStatus: (state, action) => {
       state.status = action.payload;
+    },
+    autoLogin: (state, action) => {
+      state.status = "succeeded";
+      state.error = "";
+      state.user = action.payload.user;
     },
   },
   extraReducers(builder) {
@@ -90,6 +96,7 @@ export const userSlice = createSlice({
   },
 });
 
-export const { logout, changeStatus } = userSlice.actions;
+export const { logout, changeStatus, autoLogin, updateSocket } =
+  userSlice.actions;
 
 export default userSlice.reducer;

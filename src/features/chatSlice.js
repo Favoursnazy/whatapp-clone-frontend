@@ -1,9 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-const CONVERSATION_ENDPOINT = `${
-  import.meta.env.VITE_API_ENDPOINT
-}/conversation`;
-const MESSAGES_ENDPOINT = `${import.meta.env.VITE_API_ENDPOINT}/message`;
+import { CONVERSATION_END_POINT, MESSAGES_ENDPOINT } from "../utils/constants";
+import Axios from "../api/Axios";
 
 const initialState = {
   status: "",
@@ -15,11 +12,12 @@ const initialState = {
   files: [],
 };
 
+// GET ALL CONVERSTION
 export const getConversation = createAsyncThunk(
   "conversation/all",
   async (token, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get(CONVERSATION_ENDPOINT, {
+      const { data } = await Axios.get(CONVERSATION_END_POINT, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -35,11 +33,11 @@ export const getConversation = createAsyncThunk(
 export const createConversation = createAsyncThunk(
   "conversation/open_conversation",
   async (values, { rejectWithValue }) => {
-    const { token, reciever_id, isGroup } = values;
+    const { token, reciever_id, isGroup, convo_id, unreadMessages } = values;
     try {
-      const { data } = await axios.post(
-        CONVERSATION_ENDPOINT,
-        { reciever_id, isGroup },
+      const { data } = await Axios.post(
+        CONVERSATION_END_POINT,
+        { reciever_id, isGroup, convo_id, unreadMessages },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -59,7 +57,7 @@ export const getConversationMessages = createAsyncThunk(
   async (values, { rejectWithValue }) => {
     const { token, convo_id } = values;
     try {
-      const { data } = await axios.get(`${MESSAGES_ENDPOINT}/${convo_id}`, {
+      const { data } = await Axios.get(`${MESSAGES_ENDPOINT}/${convo_id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -71,12 +69,13 @@ export const getConversationMessages = createAsyncThunk(
   }
 );
 
+// SEND MESSAGE TO USER
 export const sendMessageToUser = createAsyncThunk(
   "conversation/send_message",
   async (values, { rejectWithValue }) => {
     const { token, convo_id, message, files, voice } = values;
     try {
-      const { data } = await axios.post(
+      const { data } = await Axios.post(
         MESSAGES_ENDPOINT,
         { message, convo_id, files, voice },
         {
@@ -98,8 +97,8 @@ export const createGroupConversation = createAsyncThunk(
   async (values, { rejectWithValue }) => {
     const { token, name, users } = values;
     try {
-      const { data } = await axios.post(
-        `${CONVERSATION_ENDPOINT}/group`,
+      const { data } = await Axios.post(
+        `${CONVERSATION_END_POINT}/group`,
         { name, users },
         {
           headers: {
@@ -124,14 +123,20 @@ export const chatSlice = createSlice({
     updateMessageAndConversation: (state, action) => {
       //update messages
       let convo = state.activeConversation;
-      if (convo._id === action.payload.conversation._id) {
-        state.messages = [...state.messages, action.payload];
+      if (convo._id === action.payload.newMessage.conversation._id) {
+        state.messages = [...state.messages, action.payload.newMessage];
       }
+
       //update conversations
       let conversation = {
-        ...action.payload.conversation,
-        latestMessage: action.payload,
+        ...action.payload.newMessage.conversation,
+        latestMessage: action.payload.newMessage,
+        unreadMessages:
+          convo._id === action.payload.newMessage.conversation._id
+            ? 0
+            : action.payload.totalUnreadMessage,
       };
+
       let newConvos = [...state.conversations].filter(
         (c) => c._id !== conversation._id
       );
@@ -149,6 +154,46 @@ export const chatSlice = createSlice({
       let files = [...state.files];
       let fileToRemove = [files[index]];
       state.files = files.filter((file) => !fileToRemove.includes(file));
+    },
+    clearUnreadMessages: (state, action) => {
+      let conversation = state.conversations;
+      conversation.map((convo) => {
+        if (convo._id === action.payload) {
+          convo.unreadMessages = 0;
+        }
+      });
+    },
+    updateReadMessage: (state, action) => {
+      const conversation = state.conversations;
+      const messages = state.messages;
+      conversation.map((convo) => {
+        if (convo._id === action.payload._id) {
+          convo.latestMessage = action.payload.latestMessage;
+        }
+      });
+      messages.map((msg) => {
+        if (msg._id === action.payload.latestMessage._id) {
+          msg.status = "read";
+        }
+      });
+    },
+    clearMessageAndActiveConvo: (state, action) => {
+      state.messages = [];
+      state.activeConversation = {};
+    },
+    updateActiveConvoMessage: (state, action) => {
+      let message = state.messages;
+      let convos = state.conversations;
+      message.map((msg) => {
+        if (msg._id === action.payload._id) {
+          msg.status = "read";
+        }
+      });
+      convos.map((convo) => {
+        if (convo._id === action.payload.conversation._id) {
+          convo.latestMessage.status = "read";
+        }
+      });
     },
   },
   extraReducers(builder) {
@@ -187,10 +232,10 @@ export const chatSlice = createSlice({
       })
       .addCase(sendMessageToUser.fulfilled, (state, action) => {
         (state.status = "succeeded"),
-          (state.messages = [...state.messages, action.payload]);
+          (state.messages = [...state.messages, action.payload.message]);
         let conversation = {
-          ...action.payload.conversation,
-          latestMessage: action.payload,
+          ...action.payload.message.conversation,
+          latestMessage: action.payload.message,
         };
         let newConvos = [...state.conversations].filter(
           (c) => c._id !== conversation._id
@@ -210,6 +255,10 @@ export const {
   setActiveConversation,
   clearFiles,
   removeFileFromFiles,
+  clearUnreadMessages,
+  updateReadMessage,
+  clearMessageAndActiveConvo,
+  updateActiveConvoMessage,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

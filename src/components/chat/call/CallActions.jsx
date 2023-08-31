@@ -4,10 +4,10 @@ import { BiSolidVideo } from "react-icons/bi";
 import { IoCall } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { end_a_user_call } from "../../../features/callSlice";
-import SocketContext from "../../../context/SocketContext";
 
-const CallActions = ({ socket, tracks }) => {
+const CallActions = ({ tracks }) => {
   const dispatch = useDispatch();
+  const { socket } = useSelector((state) => state.socket);
   const { call } = useSelector((state) => state.call);
 
   const handleEndCall = () => {
@@ -53,12 +53,4 @@ const CallActions = ({ socket, tracks }) => {
   );
 };
 
-const CallActionsWithSocket = (props) => {
-  return (
-    <SocketContext.Consumer>
-      {(socket) => <CallActions socket={socket} {...props} />}
-    </SocketContext.Consumer>
-  );
-};
-
-export default CallActionsWithSocket;
+export default CallActions;

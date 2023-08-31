@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SideBar } from "../components/sidebar";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getConversation,
+  updateActiveConvoMessage,
   updateMessageAndConversation,
+  updateReadMessage,
 } from "../features/chatSlice";
 import { ChatContainer, WhatsappHome } from "../components/chat";
-import SocketContext from "../context/SocketContext";
 import {
   getChatUsername,
   getConversationId,
@@ -15,27 +16,41 @@ import {
 import { addPeer, call_a_user } from "../features/callSlice";
 import Peer from "peerjs";
 import Ringing from "../components/chat/call/Ringing";
+import { useLayoutEffect } from "react";
 
-const Home = ({ socket }) => {
+const Home = () => {
   const { user } = useSelector((state) => state.user);
   const { picture, name } = user;
+  const { socket } = useSelector((state) => state.socket);
   const { activeConversation } = useSelector((state) => state.chat);
   const { call, peerId } = useSelector((state) => state.call);
   const dispatch = useDispatch();
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [show, setShow] = useState(false);
+  const [toggleMobile, setToggleMobile] = useState(false);
 
   // Typing
   const [typing, setTyping] = useState(false);
 
+  // read message of active chat
+  useEffect(() => {
+    socket.on("user_read_message", (message) => {
+      dispatch(updateActiveConvoMessage(message));
+    });
+
+    return () => socket.off("user_read_message");
+  }, [socket, dispatch]);
+
   //join user into the socket io
   useEffect(() => {
-    socket.emit("join", user.id);
-    //get online users
-    socket.on("get-online-users", (users) => {
-      setOnlineUsers(users);
-    });
-  }, [user]);
+    if (socket !== null) {
+      socket.emit("join", user.id);
+      //get online users
+      socket.on("get-online-users", (users) => {
+        setOnlineUsers(users);
+      });
+    }
+  }, [user, socket]);
 
   // Intializing PeerJs
   useEffect(() => {
@@ -54,21 +69,38 @@ const Home = ({ socket }) => {
     }
   }, [user]);
 
-  //listening to recieved message
-  useEffect(() => {
-    return () =>
-      socket.on("recieved_message", (message) => {
+  const messageToUser = useCallback(async () => {
+    socket.on("recieved_message", async (message) => {
+      const activeConvo = sessionStorage.getItem("activeConvo");
+      if (activeConvo && activeConvo === message.newMessage.conversation._id) {
+        socket.emit("update_read_message", message.newMessage);
         dispatch(updateMessageAndConversation(message));
-      });
-  }, []);
+      } else if (
+        activeConvo &&
+        activeConvo !== message.newMessage.conversation._id
+      ) {
+        dispatch(updateMessageAndConversation(message));
+      } else if (activeConvo === null) {
+        dispatch(updateMessageAndConversation(message));
+      }
+    });
+  }, [socket, dispatch]);
+
+  //listening to recieved message
+  useLayoutEffect(() => {
+    messageToUser();
+  }, [messageToUser]);
 
   // Useffect for typing
   useEffect(() => {
+    socket.on("typing", (conversation) => setTyping(conversation));
+    socket.on("stop_typing", () => setTyping(false));
+
     return () => {
-      socket.on("typing", (conversation) => setTyping(conversation));
-      socket.on("stop_typing", () => setTyping(false));
+      socket.off("typing");
+      socket.off("stop_typing");
     };
-  }, []);
+  }, [socket]);
 
   //Call useffect
   useEffect(() => {
@@ -95,6 +127,7 @@ const Home = ({ socket }) => {
     dispatch(call_a_user(msg));
   };
 
+  // Video call
   const videoCall = () => {
     caller({ video: true });
     const msg = {
@@ -111,7 +144,7 @@ const Home = ({ socket }) => {
     setShow(true);
   };
 
-  // Audi Call/Voice Call
+  // Audio Call/Voice Call
   const audioCall = () => {
     caller({ video: false });
     const msg = {
@@ -128,19 +161,42 @@ const Home = ({ socket }) => {
     setShow(true);
   };
 
+  // socket connect error
+  useEffect(() => {
+    socket.on("connect_error", (err) => {
+      console.log(`connect_error due to ${err.message}`);
+    });
+  }, [socket]);
+
+  // recieve read message
+  useEffect(() => {
+    socket.on("recieved_read", (payload) => {
+      dispatch(updateReadMessage(payload));
+    });
+
+    return () => socket.off("recieved_read");
+  }, [socket, dispatch]);
+
   return (
     <>
       <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
         {/* Container */}
-        <div className="container h-screen flex">
+        <div className="lg:container max-md:Mdcontainer sm:Mdcontainer h-screen flex">
           {/* Sidebar */}
-          <SideBar onlineUsers={onlineUsers} typing={typing} />
+          <SideBar
+            onlineUsers={onlineUsers}
+            typing={typing}
+            toggleMobile={toggleMobile}
+            setToggleMobile={setToggleMobile}
+          />
           {activeConversation._id ? (
             <ChatContainer
               onlineUsers={onlineUsers}
               typing={typing}
               callUser={videoCall}
               audioCall={audioCall}
+              toggleMobile={toggleMobile}
+              setToggleMobile={setToggleMobile}
             />
           ) : (
             <WhatsappHome />
@@ -152,12 +208,4 @@ const Home = ({ socket }) => {
   );
 };
 
-const HomeWithSocket = (props) => {
-  return (
-    <SocketContext.Consumer>
-      {(socket) => <Home {...props} socket={socket} />}
-    </SocketContext.Consumer>
-  );
-};
-
-export default HomeWithSocket;
+export default Home;

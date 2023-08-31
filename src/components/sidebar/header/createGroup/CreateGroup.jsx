@@ -6,14 +6,21 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import { GrStatusGood } from "react-icons/gr";
-import { createGroupConversation } from "../../../../features/chatSlice";
+import {
+  createConversation,
+  createGroupConversation,
+  getConversation,
+} from "../../../../features/chatSlice";
+import { getConversationId } from "../../../../utils/chat";
+import SocketContext from "../../../../context/SocketContext";
 
 // ENV
 const SEARCH_ENDPOINT = `${import.meta.env.VITE_API_ENDPOINT}`;
 
-const CreateGroup = ({ setCreateGroup }) => {
+const CreateGroup = ({ setCreateGroup, socket }) => {
   const [name, setName] = useState("");
   const { user } = useSelector((state) => state.user);
+  const { token } = user;
   const { status } = useSelector((state) => state.chat);
   const [searchResults, setSearchResults] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -65,11 +72,21 @@ const CreateGroup = ({ setCreateGroup }) => {
       let values = {
         name,
         users,
-        token: user.token,
+        token,
       };
       let newConvo = await dispatch(createGroupConversation(values));
+      const activeGroup = {
+        reciever_id: "group",
+        isGroup: newConvo?.payload?._id,
+        token,
+      };
+      await dispatch(createConversation(activeGroup));
+      await dispatch(getConversation(token));
+      socket.emit("join_conversation", newConvo?.payload?._id);
+      setCreateGroup(false);
     }
   };
+
   return (
     <div className="createGroupAnimation relative flex0030 h-full z-40">
       {/* Container */}
@@ -108,4 +125,10 @@ const CreateGroup = ({ setCreateGroup }) => {
   );
 };
 
-export default CreateGroup;
+const CreateGroupWithContext = (props) => (
+  <SocketContext.Consumer>
+    {(socket) => <CreateGroup socket={socket} {...props} />}
+  </SocketContext.Consumer>
+);
+
+export default CreateGroupWithContext;

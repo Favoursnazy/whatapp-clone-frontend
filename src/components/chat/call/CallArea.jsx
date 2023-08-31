@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { capitalize } from "../../../utils/string";
+import { useSelector } from "react-redux";
 
 const CallArea = ({ name }) => {
+  const { call } = useSelector((state) => state.call);
   const [totalSecInCall, setTotalSecInCall] = useState(0);
 
   useEffect(() => {
@@ -24,7 +26,6 @@ const CallArea = ({ name }) => {
           <h1 className="text-white text-lg">
             <b>{name ? capitalize(name) : null}</b>
           </h1>
-          <span className="text-dark_text_1">Calling... </span>
           <div className="text-dark_text_1">
             {parseInt(totalSecInCall / 3600 >= 0) ? (
               <>
@@ -48,6 +49,16 @@ const CallArea = ({ name }) => {
                 : totalSecInCall % 60}
             </small>
           </div>
+          {/* Call Image */}
+          {!call.video && (
+            <div className="h-20 w-20 gap-x-40">
+              <img
+                src={call?.picture}
+                alt=""
+                className="w-full h-full object-cover  rounded-full"
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

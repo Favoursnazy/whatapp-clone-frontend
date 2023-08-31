@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { useState } from "react";
 import { FaMicrophone, FaPauseCircle, FaPlay, FaTrash } from "react-icons/fa";
 import { BsFillPauseFill } from "react-icons/bs";
-import SocketContext from "../../../../../context/SocketContext";
 import { useDispatch, useSelector } from "react-redux";
 import { SendIcon } from "../../../../../svg";
 import WaveSurfer from "wavesurfer.js";
@@ -15,7 +14,7 @@ import { sendMessageToUser } from "../../../../../features/chatSlice";
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_NAME;
 const CLOUD_SECRET = import.meta.env.VITE_CLOUDINARY_SECRET;
 
-const VoiceRecord = ({ setShowAudioRecorder, socket }) => {
+const VoiceRecord = ({ setShowAudioRecorder }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [waveForm, setWaveForm] = useState(null);
@@ -29,6 +28,7 @@ const VoiceRecord = ({ setShowAudioRecorder, socket }) => {
   // Redux states
   const { user } = useSelector((state) => state.user);
   const { activeConversation } = useSelector((state) => state.chat);
+  const { socket } = useSelector((state) => state.socket);
   const { token } = user;
   const dispatch = useDispatch();
 
@@ -261,13 +261,4 @@ const VoiceRecord = ({ setShowAudioRecorder, socket }) => {
     </div>
   );
 };
-
-const VoiceRecordWithSocket = (props) => {
-  return (
-    <SocketContext.Consumer>
-      {(socket) => <VoiceRecord socket={socket} {...props} />}
-    </SocketContext.Consumer>
-  );
-};
-
-export default VoiceRecordWithSocket;
+export default VoiceRecord;

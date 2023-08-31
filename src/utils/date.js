@@ -4,13 +4,13 @@ export const dateHandler = (date) => {
   let now = moment();
   let momentDate = moment(date);
   let time = momentDate.fromNow(true);
-  let dateByHourAndMin = momentDate.format("HH:mm");
+  let dateByHourAndMin = momentDate.format("HH:mm A");
   const getDay = () => {
     let days = time.split(" ")[0];
     if (Number(days) < 8) {
       return now.subtract(Number(days), "days").format("dddd");
     } else {
-      return momentDate.format("DD/MM/YYY");
+      return momentDate.format("DD/MM/YY");
     }
   };
   if (time === "a few seconds") {

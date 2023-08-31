@@ -1,6 +1,7 @@
 import moment from "moment";
 import FileAndVideoPreview from "./FileAndVideoPreview";
 import OtherFiles from "./OtherFiles";
+import MessageStatus from "../../../sidebar/MessageStatus";
 
 const FileMessage = ({ message, me, fileMessage }) => {
   const { file, type } = fileMessage;
@@ -44,9 +45,12 @@ const FileMessage = ({ message, me, fileMessage }) => {
             )}
           </div>
           {/* Message Date */}
-          <span className="absolute right-1.5 bottom-1.5 text-xs text-dark_text_5 leading-none">
-            {moment(message.createdAt).format("HH:mm")}
-          </span>
+          <div className="flex items-center justify-center gap-1 absolute right-1.5 bottom-1.5">
+            <span className="text-xs text-dark_text_5 leading-none">
+              {moment(message.createdAt).format("LT")}
+            </span>
+            {me && <MessageStatus messageStatus={message?.status} />}
+          </div>
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ import { BsFillPauseFill } from "react-icons/bs";
 import { FaPlay } from "react-icons/fa";
 import WaveSurfer from "wavesurfer.js";
 import { formatTime } from "../../../../utils/date";
+import MessageStatus from "../../../sidebar/MessageStatus";
 
 const VoiceMessageFile = ({ message, me }) => {
   const [audioMessage, setAudioMessage] = useState(null);
@@ -101,11 +102,7 @@ const VoiceMessageFile = ({ message, me }) => {
           } ${!me && "flex-row-reverse"} `}
         >
           <div className="h-14 w-14 relative">
-            <img
-              src={message.sender.picture}
-              className=" rounded-full"
-              alt=""
-            />
+            <img src={message.sender.picture} className="rounded-full" alt="" />
           </div>
           <div className="text-xl">
             {!isPlaying ? (
@@ -133,9 +130,12 @@ const VoiceMessageFile = ({ message, me }) => {
             </div>
           </div>
           {/* Message Date */}
-          <span className="absolute right-1.5 bottom-1.5 text-xs text-dark_text_5 leading-none">
-            {moment(message.createdAt).format("HH:mm")}
-          </span>
+          <div className="flex items-center justify-center gap-1 absolute right-1.5 bottom-1.5">
+            <span className="text-xs text-dark_text_5 leading-none">
+              {moment(message.createdAt).format("LT")}
+            </span>
+            {me && <MessageStatus messageStatus={message?.status} />}
+          </div>
         </div>
       </div>
     </div>

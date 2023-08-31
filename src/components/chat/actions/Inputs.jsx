@@ -2,9 +2,10 @@ import { useState } from "react";
 import SocketContext from "../../../context/SocketContext";
 import { useSelector } from "react-redux";
 
-const Inputs = ({ message, setMessage, txtRef, socket }) => {
+const Inputs = ({ message, setMessage, txtRef }) => {
   const [typing, setTyping] = useState(false);
   const { activeConversation } = useSelector((state) => state.chat);
+  const { socket } = useSelector((state) => state.socket);
 
   //Handle onchange user typing
   const onChangeHandler = (e) => {
@@ -39,12 +40,4 @@ const Inputs = ({ message, setMessage, txtRef, socket }) => {
   );
 };
 
-const InputWithSocket = (props) => {
-  return (
-    <SocketContext.Consumer>
-      {(socket) => <Inputs socket={socket} {...props} />}
-    </SocketContext.Consumer>
-  );
-};
-
-export default InputWithSocket;
+export default Inputs;

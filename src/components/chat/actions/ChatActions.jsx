@@ -6,11 +6,10 @@ import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { sendMessageToUser } from "../../../features/chatSlice";
 import { ClipLoader } from "react-spinners";
-import SocketContext from "../../../context/SocketContext";
 import { FaMicrophone } from "react-icons/fa";
 import VoiceRecord from "./attachments/menu/VoiceRecord";
 
-const ChatActions = ({ socket }) => {
+const ChatActions = () => {
   const [showPicker, setShowPicker] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
@@ -20,6 +19,7 @@ const ChatActions = ({ socket }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const { activeConversation, status } = useSelector((state) => state.chat);
+  const { socket } = useSelector((state) => state.socket);
   const { token } = user;
   const values = {
     message,
@@ -87,10 +87,4 @@ const ChatActions = ({ socket }) => {
   );
 };
 
-const ChatActionWithContext = (props) => (
-  <SocketContext.Consumer>
-    {(socket) => <ChatActions socket={socket} {...props} />}
-  </SocketContext.Consumer>
-);
-
-export default ChatActionWithContext;
+export default ChatActions;
