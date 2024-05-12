@@ -37,11 +37,11 @@ const RegisterForm = () => {
         let res = await dispatch(
           registerUser({ ...data, picture: response.secure_url })
         );
-        if (res.payload.user) navigate("/");
+        if (res.payload.user) navigate("/login");
       });
     } else {
       let res = await dispatch(registerUser({ ...data, picture: "" }));
-      if (res.payload.user) navigate("/");
+      if (res.payload.user) navigate("/login");
     }
   };
 
