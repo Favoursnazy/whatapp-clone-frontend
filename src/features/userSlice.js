@@ -77,7 +77,6 @@ export const userSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.error = "";
-        state.user = action.payload.user;
       })
       .addCase(registerUser.rejected, (state, action) => {
         (state.status = "failed"), (state.error = action.payload);
