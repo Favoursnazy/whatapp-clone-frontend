@@ -1,6 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { CONVERSATION_END_POINT, MESSAGES_ENDPOINT } from "../utils/constants";
-import Axios from "../api/Axios";
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   socket: null,
@@ -13,9 +11,12 @@ export const socketSlice = createSlice({
     initializeSocket: (state, action) => {
       state.socket = action.payload;
     },
+    clearSocket: (state) => {
+      state.socket = null;
+    },
   },
 });
 
-export const { initializeSocket } = socketSlice.actions;
+export const { initializeSocket, clearSocket } = socketSlice.actions;
 
 export default socketSlice.reducer;

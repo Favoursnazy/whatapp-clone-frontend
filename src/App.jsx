@@ -9,16 +9,14 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { useDispatch, useSelector } from "react-redux";
-import SocketContext from "./context/SocketContext";
 import ToastContainer from "./utils/ToastContainer";
-import { useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { isExpired } from "react-jwt";
 import { SERVER_URL, AUTH_END_POINT } from "./utils/constants";
 import { autoLogin, logout } from "./features/userSlice";
 import Axios from "./api/Axios";
 import { toast } from "react-hot-toast";
 import { io } from "socket.io-client";
-import { useEffect } from "react";
 import { initializeSocket } from "./features/socketSlice";
 
 // Socket
@@ -60,35 +58,37 @@ function App() {
       dispatch(initializeSocket(globalSocket));
     };
     fetchUserInfo();
-  }, [user]);
+  }, [token]);
+
+  useEffect(() => {
+    dispatch(initializeSocket(globalSocket));
+  });
 
   return (
-    socket && (
-      <div className="dark">
-        <ToastContainer />
-        {/* <SocketContext.Provider value={globalSocket}> */}
-        <Router>
-          <Routes>
-            <Route
-              exact
-              path="/"
-              element={token ? <Home /> : <Navigate to="/login" />}
-            />
-            <Route
-              exact
-              path="/login"
-              element={!token ? <Login /> : <Navigate to="/" />}
-            />
-            <Route
-              exact
-              path="/register"
-              element={!token ? <Register /> : <Navigate to="/" />}
-            />
-          </Routes>
-        </Router>
-        {/* </SocketContext.Provider> */}
-      </div>
-    )
+    <div className="dark">
+      <ToastContainer />
+      {/* <SocketContext.Provider value={globalSocket}> */}
+      <Router>
+        <Routes>
+          <Route
+            exact
+            path="/"
+            element={token ? <Home /> : <Navigate to="/login" />}
+          />
+          <Route
+            exact
+            path="/login"
+            element={!token ? <Login /> : <Navigate to="/" />}
+          />
+          <Route
+            exact
+            path="/register"
+            element={!token ? <Register /> : <Navigate to="/" />}
+          />
+        </Routes>
+      </Router>
+      {/* </SocketContext.Provider> */}
+    </div>
   );
 }
 

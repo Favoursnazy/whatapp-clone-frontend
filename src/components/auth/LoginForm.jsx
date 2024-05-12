@@ -7,6 +7,11 @@ import { useDispatch, useSelector } from "react-redux";
 import PulseLoader from "react-spinners/PulseLoader";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../../features/userSlice";
+import { initializeSocket } from "../../features/socketSlice";
+import { io } from "socket.io-client";
+import { SERVER_URL } from "../../utils/constants";
+
+const globalSocket = io(SERVER_URL);
 
 const LoginForm = () => {
   const { status, error } = useSelector((state) => state.user);
@@ -22,7 +27,10 @@ const LoginForm = () => {
 
   const onSubmit = async (data) => {
     let res = await dispatch(loginUser({ ...data }));
-    if (res.payload?.user) navigate("/");
+    if (res.payload?.user) {
+      dispatch(initializeSocket(globalSocket));
+      navigate("/");
+    }
     await localStorage.setItem("token", res.payload?.user.token);
   };
 
