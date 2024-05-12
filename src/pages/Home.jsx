@@ -44,11 +44,12 @@ const Home = () => {
 
   // read message of active chat
   useEffect(() => {
-    socket.on("user_read_message", (message) => {
-      dispatch(updateActiveConvoMessage(message));
-    });
-
-    return () => socket.off("user_read_message");
+    if (socket !== null) {
+      socket.on("user_read_message", (message) => {
+        dispatch(updateActiveConvoMessage(message));
+      });
+      return () => socket.off("user_read_message");
+    }
   }, [socket, dispatch]);
 
   // Intializing PeerJs
@@ -69,20 +70,27 @@ const Home = () => {
   }, [user]);
 
   const messageToUser = useCallback(async () => {
-    socket.on("recieved_message", async (message) => {
-      const activeConvo = sessionStorage.getItem("activeConvo");
-      if (activeConvo && activeConvo === message.newMessage.conversation._id) {
-        socket.emit("update_read_message", message.newMessage);
-        dispatch(updateMessageAndConversation(message));
-      } else if (
-        activeConvo &&
-        activeConvo !== message.newMessage.conversation._id
-      ) {
-        dispatch(updateMessageAndConversation(message));
-      } else if (activeConvo === null) {
-        dispatch(updateMessageAndConversation(message));
-      }
-    });
+    if (socket !== null) {
+      socket.on("recieved_message", async (message) => {
+        const activeConvo = sessionStorage.getItem("activeConvo");
+        if (
+          activeConvo &&
+          activeConvo === message.newMessage.conversation._id
+        ) {
+          socket.emit("update_read_message", message.newMessage);
+          dispatch(updateMessageAndConversation(message));
+        } else if (
+          activeConvo &&
+          activeConvo !== message.newMessage.conversation._id
+        ) {
+          dispatch(updateMessageAndConversation(message));
+        } else if (activeConvo === null) {
+          dispatch(updateMessageAndConversation(message));
+        }
+      });
+
+      return () => socket.off("recieved_message");
+    }
   }, [socket, dispatch, user]);
 
   //listening to recieved message
@@ -92,22 +100,26 @@ const Home = () => {
 
   // Useffect for typing
   useEffect(() => {
-    socket.on("typing", (conversation) => setTyping(conversation));
-    socket.on("stop_typing", () => setTyping(false));
+    if (socket !== null) {
+      socket.on("typing", (conversation) => setTyping(conversation));
+      socket.on("stop_typing", () => setTyping(false));
 
-    return () => {
-      socket.off("typing");
-      socket.off("stop_typing");
-    };
+      return () => {
+        socket.off("typing");
+        socket.off("stop_typing");
+      };
+    }
   }, [socket]);
 
   //Call useffect
   useEffect(() => {
-    socket.on("callUserToClient", (data) => {
-      dispatch(call_a_user(data));
-    });
+    if (socket !== null) {
+      socket.on("callUserToClient", (data) => {
+        dispatch(call_a_user(data));
+      });
 
-    return () => socket.off("callUserToClient");
+      return () => socket.off("callUserToClient");
+    }
   }, [dispatch, socket]);
 
   //call user function
@@ -162,18 +174,22 @@ const Home = () => {
 
   // socket connect error
   useEffect(() => {
-    socket.on("connect_error", (err) => {
-      console.log(`connect_error due to ${err.message}`);
-    });
+    if (socket !== null) {
+      socket.on("connect_error", (err) => {
+        console.log(`connect_error due to ${err.message}`);
+      });
+    }
   }, [socket]);
 
   // recieve read message
   useEffect(() => {
-    socket.on("recieved_read", (payload) => {
-      dispatch(updateReadMessage(payload));
-    });
+    if (socket !== null) {
+      socket.on("recieved_read", (payload) => {
+        dispatch(updateReadMessage(payload));
+      });
 
-    return () => socket.off("recieved_read");
+      return () => socket.off("recieved_read");
+    }
   }, [socket, dispatch]);
 
   return (
