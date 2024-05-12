@@ -31,16 +31,6 @@ const Home = () => {
 
   // Typing
   const [typing, setTyping] = useState(false);
-
-  // read message of active chat
-  useEffect(() => {
-    socket.on("user_read_message", (message) => {
-      dispatch(updateActiveConvoMessage(message));
-    });
-
-    return () => socket.off("user_read_message");
-  }, [socket, dispatch]);
-
   //join user into the socket io
   useEffect(() => {
     if (socket !== null) {
@@ -51,6 +41,15 @@ const Home = () => {
       });
     }
   }, [user, socket]);
+
+  // read message of active chat
+  useEffect(() => {
+    socket.on("user_read_message", (message) => {
+      dispatch(updateActiveConvoMessage(message));
+    });
+
+    return () => socket.off("user_read_message");
+  }, [socket, dispatch]);
 
   // Intializing PeerJs
   useEffect(() => {
@@ -84,12 +83,12 @@ const Home = () => {
         dispatch(updateMessageAndConversation(message));
       }
     });
-  }, [socket, dispatch]);
+  }, [socket, dispatch, user]);
 
   //listening to recieved message
   useLayoutEffect(() => {
     messageToUser();
-  }, [messageToUser]);
+  }, [messageToUser, socket]);
 
   // Useffect for typing
   useEffect(() => {

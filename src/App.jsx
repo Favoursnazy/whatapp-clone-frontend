@@ -58,11 +58,7 @@ function App() {
       dispatch(initializeSocket(globalSocket));
     };
     fetchUserInfo();
-  }, [token]);
-
-  useEffect(() => {
-    dispatch(initializeSocket(globalSocket));
-  });
+  }, []);
 
   return (
     <div className="dark">
