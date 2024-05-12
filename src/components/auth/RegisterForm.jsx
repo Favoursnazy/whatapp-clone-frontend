@@ -9,6 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { changeStatus, registerUser } from "../../features/userSlice";
 import Picture from "./Picture";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 //environment varials
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_NAME;
@@ -42,6 +43,15 @@ const RegisterForm = () => {
     } else {
       let res = await dispatch(registerUser({ ...data, picture: "" }));
       if (res.payload.user) navigate("/login");
+
+      toast.success("Registration succesful, Please Login Now!", {
+        icon: "👏",
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
     }
   };
 

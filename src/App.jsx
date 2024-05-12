@@ -10,7 +10,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { useDispatch, useSelector } from "react-redux";
 import ToastContainer from "./utils/ToastContainer";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { isExpired } from "react-jwt";
 import { SERVER_URL, AUTH_END_POINT } from "./utils/constants";
 import { autoLogin, logout } from "./features/userSlice";
