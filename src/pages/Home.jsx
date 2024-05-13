@@ -55,7 +55,7 @@ const Home = () => {
   // Intializing PeerJs
   useEffect(() => {
     const newPeer = new Peer(undefined, {
-      host: "/",
+      host: "https://whatsapp-backend-9clh.onrender.com",
       port: "3001",
     });
 
